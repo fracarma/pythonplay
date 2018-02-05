@@ -3,6 +3,8 @@ from time import sleep
 from sys import exit
 from pynput.keyboard import Key, Listener
 
+from Sound import Sound
+
 def play_sound(button):
     try:
         if(button == 11):
@@ -31,7 +33,7 @@ pygame.joystick.init()
 # Detect if joystick is available
 joysticks = pygame.joystick.get_count()
 if joysticks:
-    print str(joysticks) + " joystick(s) detected!"
+    print(str(joysticks) + " joystick(s) detected!")
 
 # Initialize each joystick
 for i in range(joysticks):
@@ -39,13 +41,31 @@ for i in range(joysticks):
     joystick.init()
     name = joystick.get_name()
     numberOfButtons = joystick.get_numbuttons()
-    print "Joystick " + str(i) + " name: " + name + "buttons: " + str(numberOfButtons)
-    
+    print("Joystick " + str(i) + " name: " + name + "buttons: " + str(numberOfButtons))
+
 going = True
+
+def on_press(key):
+    try:
+        if(key.char == 'a'):
+            if(soundChannelA.get_busy()): return
+            soundChannelA.play(sndA)
+        if(key.char == 's'):
+            if(soundChannelB.get_busy()): return
+            soundChannelB.play(sndB)
+        if(key.char == 'd'):
+            if(soundChannelC.get_busy()): return
+            soundChannelC.play(sndC)
+        if(key.char == 'e'):
+            exit()
+    except AttributeError:
+        print('special key {0} pressed'.format(
+            key))
+
+with Listener(on_press=on_press) as listener:
+    listener.join()
 while going:
     for event in pygame.event.get():
         if event.type in [pygame.JOYBUTTONUP, pygame.JOYBUTTONDOWN]:
-            print str(event.type) + ' ' + str(event.button)
+            print(str(event.type) + ' ' + str(event.button))
             play_sound(event.button)
-
-
