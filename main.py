@@ -5,8 +5,10 @@ from Sound import Sound
 import Config
 
 def initializeSoundMap():
+    i = 0
     for key, value in Config.BANK_AND_BUTTON_SOUND_MAP.items():
-        bankAndButtonToSoundDict[key] = Sound(value)
+        bankAndButtonToSoundDict[key] = Sound(value, i)
+        i += 1
 
 bankAndButtonToSoundDict = {}
 initializeSoundMap()
@@ -20,7 +22,6 @@ def play_sound(key):
         print("Cannot find any sound mapped to bank {0} and key {1}".format(currentBank,key.char))
         return
     sound = bankAndButtonToSoundDict[index]
-    if(sound.channel.get_busy()): return
     sound.play()
 
 def bank_up(currentBank):
@@ -48,7 +49,6 @@ def on_press(key):
             currentBank = bank_up(currentBank)
         if(key == key.down):
             currentBank = bank_down(currentBank)
-        print(currentBank)
 
 with Listener(on_press=on_press) as listener:
     listener.join()
