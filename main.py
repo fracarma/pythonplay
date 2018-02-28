@@ -1,8 +1,11 @@
 from sys import exit
-from pynput.keyboard import Key, Listener
 
 from Sound import Sound
 import Config
+import pygame
+pygame.init()
+screen = pygame.display.set_mode((500,500))
+screen.fill((255, 255, 0))
 
 def initializeSoundMap():
     i = 0
@@ -17,9 +20,9 @@ banks = set([key[0] for key in bankAndButtonToSoundDict.keys()])
 currentBank = 0
 
 def play_sound(key):
-    index = (currentBank,key.char)
+    index = (currentBank,key)
     if(not index in bankAndButtonToSoundDict):
-        print("Cannot find any sound mapped to bank {0} and key {1}".format(currentBank,key.char))
+        print("Cannot find any sound mapped to bank {0} and key {1}".format(currentBank,key))
         return
     sound = bankAndButtonToSoundDict[index]
     sound.play()
@@ -35,20 +38,23 @@ def bank_down(currentBank):
     else:
         return max(banks)
 
-
 def on_press(key):
     global currentBank
-    try:
-        if(key.char == 'e'):
-            exit()
-        play_sound(key)
-    except AttributeError:
-        print('special key {0} pressed'.format(
-            key))
-        if(key == key.up):
-            currentBank = bank_up(currentBank)
-        if(key == key.down):
-            currentBank = bank_down(currentBank)
+    if(key.unicode == 'e'):
+        exit()
+    if(key.key == 273):
+        currentBank = bank_up(currentBank)
+        return
+    if(key.key == 274):
+        currentBank = bank_down(currentBank)
+        return
+    play_sound(key.unicode)
 
-with Listener(on_press=on_press) as listener:
-    listener.join()
+
+going = True
+while going:
+    for event in pygame.event.get():
+        if(event.type == pygame.QUIT) :
+            exit()
+        if(event.type == pygame.KEYDOWN) :
+            on_press(event)
